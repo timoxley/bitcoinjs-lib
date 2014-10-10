@@ -165,7 +165,7 @@ function isNulldataOutput() {
 // {pubKey} OP_CHECKSIG
 function pubKeyOutput(pubKey) {
   return Script.fromChunks([
-    pubKey.toBuffer(),
+    pubKey,
     opcodes.OP_CHECKSIG
   ])
 }
@@ -199,15 +199,11 @@ function multisigOutput(m, pubKeys) {
   enforceType('Array', pubKeys)
 
   assert(pubKeys.length >= m, 'Not enough pubKeys provided')
-
-  var pubKeyBuffers = pubKeys.map(function(pubKey) {
-    return pubKey.toBuffer()
-  })
   var n = pubKeys.length
 
   return Script.fromChunks([].concat(
     (opcodes.OP_1 - 1) + m,
-    pubKeyBuffers,
+    pubKeys,
     (opcodes.OP_1 - 1) + n,
     opcodes.OP_CHECKMULTISIG
   ))
@@ -223,8 +219,9 @@ function pubKeyInput(signature) {
 // {signature} {pubKey}
 function pubKeyHashInput(signature, pubKey) {
   enforceType('Buffer', signature)
+  enforceType('Buffer', pubKey)
 
-  return Script.fromChunks([signature, pubKey.toBuffer()])
+  return Script.fromChunks([signature, pubKey])
 }
 
 // <scriptSig> {serialized scriptPubKey script}
